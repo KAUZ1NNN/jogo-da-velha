@@ -9,6 +9,8 @@ let players = [];
 let gameStarted = false;
 
 io.on('connection', (socket) => {
+    let players = [];
+let usernames = {};
   if (players.length < 2) {
     players.push(socket.id);
     socket.emit('playerNumber', players.length);
@@ -22,6 +24,27 @@ io.on('connection', (socket) => {
       });
     
   }
+  socket.on('setUsername', (name) => {
+    usernames[socket.id] = name;
+  
+    if (!players.includes(socket.id)) {
+      players.push(socket.id);
+    }
+  
+    if (players.length === 2) {
+      const player1 = usernames[players[0]];
+      const player2 = usernames[players[1]];
+  
+      io.to(players[0]).emit('playerNumber', 1);
+      io.to(players[1]).emit('playerNumber', 2);
+  
+      io.to(players[0]).emit('playersReady', { you: player1, opponent: player2 });
+      io.to(players[1]).emit('playersReady', { you: player2, opponent: player1 });
+  
+      io.emit('startGame');
+    }
+  });
+  
 
   socket.on('playMove', (data) => {
     socket.broadcast.emit('opponentMove', data);
@@ -43,8 +66,9 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     players = players.filter(p => p !== socket.id);
+    delete usernames[socket.id];
     io.emit('playerLeft');
-  });
+  });  
 });
 
 const PORT = process.env.PORT || 3000;

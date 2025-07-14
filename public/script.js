@@ -6,12 +6,33 @@ let interval = null;
 let board = Array(9).fill('');
 let gameOver = false;
 
+let victories = 0;
+let defeats = 0;
+let draws = 0;
+let username = '';
+let opponentName = '';
+
+
 const cells = document.querySelectorAll('.cell');
 
-socket.on('playerNumber', (num) => {
-  playerNum = num;
-  document.getElementById('player').innerText = `Você é o Jogador ${playerNum} (${playerNum === 1 ? 'X' : 'O'})`;
-});
+function start() {
+    username = document.getElementById('username').value.trim();
+    if (!username) return alert('Digite seu nome!');
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+    socket.emit('setUsername', username);
+  }
+  
+
+  socket.on('playerNumber', (num) => {
+    playerNum = num;
+  });
+  socket.on('playersReady', ({ you, opponent }) => {
+    opponentName = opponent;
+    document.getElementById('player').innerText =
+      `Você: ${you} (${playerNum === 1 ? 'X' : 'O'}) vs ${opponent}`;
+  });
+    
 
 socket.on('startGame', () => {
   document.getElementById('player').innerText += " | Jogo iniciado!";
@@ -140,17 +161,29 @@ socket.on('playerLeft', () => {
 });
 
 function showResult(message) {
-  const resultCard = document.createElement('div');
-  resultCard.id = 'resultCard';
-  resultCard.innerHTML = `
-    <div class="card">
-      <h2>${message}</h2>
-      <button onclick="restartGame()">Jogar Novamente</button>
-      <button onclick="exitGame()">Sair</button>
-    </div>
-  `;
-  document.body.appendChild(resultCard);
-}
+    if (message === "Você venceu!") victories++;
+    if (message === "Você perdeu!") defeats++;
+    if (message === "Empate!") draws++;
+  
+    updateScore();
+  
+    const resultCard = document.createElement('div');
+    resultCard.id = 'resultCard';
+    resultCard.innerHTML = `
+      <div class="card">
+        <h2>${message}</h2>
+        <button onclick="restartGame()">Jogar Novamente</button>
+        <button onclick="exitGame()">Sair</button>
+      </div>
+    `;
+    document.body.appendChild(resultCard);
+  }
+  
+  function updateScore() {
+    document.getElementById('score').innerText =
+      `Vitórias: ${victories} | Derrotas: ${defeats} | Empates: ${draws}`;
+  }
+  
 
 function restartGame() {
   location.reload();

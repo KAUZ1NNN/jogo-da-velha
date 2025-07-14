@@ -6,12 +6,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Jogo da Velha Online</h1>
-  <div id="info">
-    <p id="player">Esperando outro jogador...</p>
-    <p id="timer">Tempo: 0s</p>
-  </div>
+    <h1>Jogo da Velha Online</h1>
 
+    <div id="login">
+      <input type="text" id="username" placeholder="Seu nome" />
+      <button onclick="start()">Entrar</button>
+    </div>
+    
+    <div id="game" style="display:none;">
+      <div id="info">
+        <p id="player">Esperando outro jogador...</p>
+        <p id="timer">Tempo: 0s</p>
+        <p id="score">Vitórias: 0 | Derrotas: 0 | Empates: 0</p>
+      </div>
+    
   <div id="board">
     <!-- Gera 9 casas -->
     <div class="cell" data-index="0"></div>
