@@ -17,6 +17,10 @@ io.on('connection', (socket) => {
       gameStarted = true;
       io.emit('startGame');
     }
+    socket.on('gameOver', (result) => {
+        socket.broadcast.emit('gameOver', result);
+      });
+    
   }
 
   socket.on('playMove', (data) => {
