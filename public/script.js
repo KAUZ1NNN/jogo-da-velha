@@ -5,6 +5,7 @@ let timer = 0;
 let interval = null;
 let board = Array(9).fill('');
 let gameOver = false;
+let partidaAtiva = false;
 
 let victories = 0;
 let defeats = 0;
@@ -34,7 +35,8 @@ function start() {
   });
     
 
-socket.on('startGame', () => {
+  socket.on('startGame', () => {
+    partidaAtiva = true;
   document.getElementById('player').innerText += " | Jogo iniciado!";
   myTurn = playerNum === 1;
   startTimer();
@@ -156,9 +158,11 @@ socket.on('gameEnded', () => {
 });
 
 socket.on('playerLeft', () => {
-  alert('Seu oponente saiu da partida.');
-  location.reload();
-});
+    if (partidaAtiva) {
+      alert('Seu oponente saiu da partida.');
+      location.reload();
+    }
+  });
 
 function showResult(message) {
     if (message === "Você venceu!") victories++;

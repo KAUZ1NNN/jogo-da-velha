@@ -19,7 +19,8 @@ io.on('connection', (socket) => {
     }
 
     if (players.length === 2 && !gameStarted) {
-      gameStarted = true;
+        gameStarted = true;
+      
       const player1 = usernames[players[0]];
       const player2 = usernames[players[1]];
 
@@ -59,8 +60,14 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     players = players.filter(p => p !== socket.id);
     delete usernames[socket.id];
-    io.emit('playerLeft');
+  
+    // Se menos de 2 jogadores, encerre o jogo e informe
+    if (players.length < 2 && gameStarted) {
+      gameStarted = false;
+      io.emit('playerLeft');
+    }
   });
+  
 });
 
 const PORT = process.env.PORT || 3000;
