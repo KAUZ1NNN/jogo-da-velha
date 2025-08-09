@@ -2,44 +2,182 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jogo da Velha Online</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Jogo da Velha Online</h1>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-gamepad"></i> Jogo da Velha Online</h1>
+      <p class="subtitle">Conecte-se com amigos e divirta-se!</p>
+    </header>
 
-    <div id="login">
-      <input type="text" id="username" placeholder="Seu nome" />
-      <button onclick="start()">Entrar</button>
-    </div>
-    
-    <div id="game" style="display:none;">
-      <div id="info">
-        <p id="player">Esperando outro jogador...</p>
-        <p id="timer">Tempo: 0s</p>
-        <p id="score">Vitórias: 0 | Derrotas: 0 | Empates: 0</p>
+    <!-- Tela de Entrada -->
+    <div id="loginScreen" class="screen active">
+      <div class="card">
+        <h2>🎯 Como deseja jogar?</h2>
+        
+        <div class="login-form">
+          <input type="text" id="username" placeholder="Digite seu nome" maxlength="20" />
+          
+          <div class="game-options">
+            <button class="btn btn-primary" onclick="createRoom()">
+              <i class="fas fa-plus"></i>
+              Criar Sala
+            </button>
+            
+            <div class="divider">ou</div>
+            
+            <div class="join-room">
+              <input type="text" id="roomCode" placeholder="Código da sala (5 letras)" maxlength="5" />
+              <button class="btn btn-secondary" onclick="joinRoom()">
+                <i class="fas fa-sign-in-alt"></i>
+                Entrar
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    
-  <div id="board">
-    <!-- Gera 9 casas -->
-    <div class="cell" data-index="0"></div>
-    <div class="cell" data-index="1"></div>
-    <div class="cell" data-index="2"></div>
-    <div class="cell" data-index="3"></div>
-    <div class="cell" data-index="4"></div>
-    <div class="cell" data-index="5"></div>
-    <div class="cell" data-index="6"></div>
-    <div class="cell" data-index="7"></div>
-    <div class="cell" data-index="8"></div>
-  </div>
+    </div>
 
-  <div id="chat">
-    <div id="messages"></div>
-    <input id="messageInput" placeholder="Mensagem..." />
-    <button onclick="sendMessage()">Enviar</button>
-  </div>
+    <!-- Tela de Espera -->
+    <div id="waitingScreen" class="screen">
+      <div class="card">
+        <div class="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <h2 id="waitingTitle">Criando sala...</h2>
+        <div id="roomInfo" style="display: none;">
+          <div class="room-code-display">
+            <h3>Código da Sala:</h3>
+            <div class="room-code" id="displayRoomCode">-----</div>
+            <button class="btn btn-outline" onclick="copyRoomCode()">
+              <i class="fas fa-copy"></i> Copiar Código
+            </button>
+          </div>
+          <p class="waiting-text">Compartilhe este código com seu amigo!</p>
+        </div>
+      </div>
+    </div>
 
-  <button id="endGameBtn" onclick="requestEndGame()">Encerrar Partida</button>
+    <!-- Tela do Jogo -->
+    <div id="gameScreen" class="screen">
+      <div class="game-header">
+        <div class="players-info">
+          <div class="player-card" id="player1Card">
+            <div class="player-symbol">X</div>
+            <div class="player-name" id="player1Name">Jogador 1</div>
+          </div>
+          
+          <div class="vs">VS</div>
+          
+          <div class="player-card" id="player2Card">
+            <div class="player-symbol">O</div>
+            <div class="player-name" id="player2Name">Jogador 2</div>
+          </div>
+        </div>
+        
+        <div class="game-status">
+          <div class="turn-indicator" id="turnIndicator">
+            <i class="fas fa-hourglass-half"></i>
+            <span id="turnText">Sua vez!</span>
+          </div>
+          <div class="timer" id="timer">
+            <i class="fas fa-clock"></i>
+            <span id="timeText">00:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-content">
+        <div class="board-container">
+          <div id="board" class="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+          </div>
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-header">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+          </div>
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Digite uma mensagem..." maxlength="100" />
+            <button onclick="sendMessage()" class="btn btn-chat">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="btn btn-outline" onclick="requestNewGame()">
+          <i class="fas fa-redo"></i>
+          Nova Partida
+        </button>
+        <button class="btn btn-danger" onclick="leaveRoom()">
+          <i class="fas fa-sign-out-alt"></i>
+          Sair da Sala
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal de Resultado -->
+    <div id="resultModal" class="modal">
+      <div class="modal-content">
+        <div class="result-icon" id="resultIcon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <h2 id="resultTitle">Resultado</h2>
+        <p id="resultMessage">Mensagem do resultado</p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="requestNewGame()">
+            <i class="fas fa-redo"></i>
+            Jogar Novamente
+          </button>
+          <button class="btn btn-outline" onclick="closeResultModal()">
+            <i class="fas fa-times"></i>
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Nova Partida -->
+    <div id="newGameModal" class="modal">
+      <div class="modal-content">
+        <div class="result-icon">
+          <i class="fas fa-redo"></i>
+        </div>
+        <h2>Nova Partida</h2>
+        <p id="newGameMessage">Seu oponente quer jogar novamente!</p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="acceptNewGame()">
+            <i class="fas fa-check"></i>
+            Aceitar
+          </button>
+          <button class="btn btn-outline" onclick="declineNewGame()">
+            <i class="fas fa-times"></i>
+            Recusar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast para notificações -->
+    <div id="toast" class="toast"></div>
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
